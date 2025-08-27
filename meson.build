@@ -2,7 +2,7 @@ project('allocators', 'c',
   version : '0.0.1',
   meson_version : '>=1.6.0',
   default_options : [
-    'c_std=c23',
+    'c_std=c2x',
     'werror=true',
   ]
 )
@@ -31,3 +31,14 @@ allocators_shared_lib = library('allocators',
 if install_headers
   install_headers('include/allocators/arena.h', subdir: 'allocators')
 endif
+
+# Tests
+unity_dirs = include_directories('tests/unity')
+arena_test_exe = executable('arena_test',
+  'src/arena.c',
+  'tests/test_arena.c',
+  'tests/unity/src/unity.c',
+  include_directories: [unity_dirs, '.'],
+)
+
+test('Arena tests', arena_test_exe)
