@@ -1,5 +1,7 @@
 # Allocators
 
+![CI Badge](https://github.com/smallblue2/allocators/actions/workflows/ci.yml/badge.svg)
+
 A C library containing various allocator alternatives to `malloc` and `free`.
 
 Mostly for my own personal use to avoid re-writing various allocators, I will add more allocators as I come across them.
