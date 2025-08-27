@@ -1,0 +1,5 @@
+option('install_headers',
+  type: 'boolean',
+  value: true,
+  description: 'Install header files'
+)
