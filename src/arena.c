@@ -14,12 +14,12 @@ struct arena_t {
 
 arena_t *arena_create(size_t size) {
   arena_t *arena = (arena_t*)malloc(sizeof(arena_t));
-  if (arena == nullptr) { return nullptr; }
+  if (arena == NULL) { return NULL; }
 
   arena->memory = (void*)malloc(size);
-  if (arena->memory == nullptr) {
+  if (arena->memory == NULL) {
     free(arena);
-    return nullptr;
+    return NULL;
   }
 
   // Zero our memory block
@@ -32,13 +32,15 @@ arena_t *arena_create(size_t size) {
 }
 
 void *arena_alloc_aligned(arena_t *arena, size_t size, size_t align) {
-  // Convert pointer to integer for bitwise arithmetic
   uintptr_t current = (uintptr_t)arena->pos;
-  // Bitmask magic to magically round up to the closest multiple of `align`
+  // Ensure the start is aligned
   uintptr_t aligned = (current + (align - 1)) & ~(align - 1);
-  arena->pos = (void*)aligned;
-  arena->used = aligned - (uintptr_t)arena->memory;
-  return (void*)current;
+
+  // Ensure we're within bounds
+  if (aligned + size > (uintptr_t)arena->memory + arena->size) return NULL;
+  arena->pos = (void*)(aligned + size);
+  arena->used = (uintptr_t)arena->pos - (uintptr_t)arena->memory;
+  return (void*)aligned;
 }
 
 void *arena_alloc(arena_t *arena, size_t size) {

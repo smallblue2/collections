@@ -7,6 +7,7 @@
 #include <string.h>
 #include <pthread.h>
 #include <stddef.h>
+#include <stdalign.h>
 
 typedef struct arena_t alctr_arena_t;
 
@@ -48,8 +49,9 @@ void *arena_alloc_aligned(alctr_arena_t *arena, size_t size, size_t align);
  * @param size Number of bytes to allocate.
  * @return Pointer to the requested block of memory, or `nullptr` on error.
  *
- * @note The lifetime of the returned memory is tied to the arena.
- *       Do not free() it manually.
+ * @note Due to using max alignment, it might appear
+ *       to be out of memory earlier than expected,
+ *       particularly for smaller arenas.
  */
 void *arena_alloc(alctr_arena_t *arena, size_t size);
 
