@@ -2,7 +2,7 @@
 
 A C library containing various allocator alternatives to `malloc` and `free`.
 
-Mostly for my own personal use to avoid re-writing various allocators, I will add the various allocators available as I come across them.
+Mostly for my own personal use to avoid re-writing various allocators, I will add more allocators as I come across them.
 
 ## Current Allocators
 
