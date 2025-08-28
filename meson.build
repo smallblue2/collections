@@ -32,6 +32,16 @@ if install_headers
   install_headers('include/allocators/arena.h', subdir: 'allocators')
 endif
 
+pkgconfig = import('pkgconfig')
+
+pkgconfig.generate(
+  name: 'allocators',
+  description: project_description,
+  version: meson.project_version(),
+  libraries: [allocators_shared_lib],
+  subdirs: 'allocators'
+)
+
 # Tests
 unity_dirs = include_directories('tests/unity')
 arena_test_exe = executable('arena_test',
