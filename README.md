@@ -4,7 +4,7 @@
 
 A C library containing various collections to assist C development.
 
-This is mostly for my own learning in the underlying implementation of collections, api design and libary creation.
+This is mostly for my own learning in the underlying implementation of collections, api design and library creation.
 
 ## Current Collections
 
