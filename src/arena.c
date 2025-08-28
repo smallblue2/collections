@@ -1,8 +1,8 @@
-#include "../include/allocators/arena.h"
+#include "../include/collections/arena.h"
 #include <stddef.h>
 #include <stdint.h>
 
-typedef alctr_arena_t arena_t;
+typedef c_arena_t arena_t;
 
 struct arena_t {
   void *memory;

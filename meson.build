@@ -1,4 +1,4 @@
-project('allocators', 'c',
+project('collections', 'c',
   version : '0.0.1',
   meson_version : '>=1.6.0',
   default_options : [
@@ -8,8 +8,8 @@ project('allocators', 'c',
 )
 
 # project info
-project_description = 'A library of custom allocators for better heap memory management in C.'
-project_url = ''
+project_description = 'A library of custom collections for better developer experience in C.'
+project_url = 'git@github.com:smallblue2/collections.git'
 
 # build options
 install_headers = get_option('install_headers')
@@ -18,28 +18,28 @@ sources = [
   'src/arena.c'
 ]
 
-allocators_static_lib = static_library('allocators',
+collections_static_lib = static_library('collections',
   sources,
   install: true
 )
 
-allocators_shared_lib = library('allocators',
+collections_shared_lib = library('collections',
   sources,
   install: true
 )
 
 if install_headers
-  install_headers('include/allocators/arena.h', subdir: 'allocators')
+  install_headers('include/collections/arena.h', subdir: 'collections')
 endif
 
 pkgconfig = import('pkgconfig')
 
 pkgconfig.generate(
-  name: 'allocators',
+  name: 'collections',
   description: project_description,
   version: meson.project_version(),
-  libraries: [allocators_shared_lib],
-  subdirs: 'allocators'
+  libraries: [collections_shared_lib],
+  subdirs: 'collections'
 )
 
 # Tests

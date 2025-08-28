@@ -1,19 +1,19 @@
 #include <stdint.h>
 #include <string.h>
 #include "unity/src/unity.h"
-#include "../include/allocators/arena.h"
+#include "../include/collections/arena.h"
 
 void setUp(void) {}
 void tearDown(void) {}
 
 void test_arena_create() {
-  alctr_arena_t *arena = arena_create(1024);
+  c_arena_t *arena = arena_create(1024);
   TEST_ASSERT_NOT_NULL(arena);
   arena_free(arena);
 }
 
 void test_arena_alloc_aligned_8() {
-  alctr_arena_t *arena = arena_create(678);
+  c_arena_t *arena = arena_create(678);
   TEST_ASSERT_NOT_NULL(arena);
   void *ptr1 = arena_alloc_aligned(arena, 12, 8);
   TEST_ASSERT_NOT_NULL(ptr1);
@@ -25,7 +25,7 @@ void test_arena_alloc_aligned_8() {
 }
 
 void test_arena_alloc_aligned_4() {
-  alctr_arena_t *arena = arena_create(54);
+  c_arena_t *arena = arena_create(54);
   TEST_ASSERT_NOT_NULL(arena);
   void *ptr1 = arena_alloc_aligned(arena, 12, 4);
   TEST_ASSERT_NOT_NULL(ptr1);
@@ -37,7 +37,7 @@ void test_arena_alloc_aligned_4() {
 }
 
 void test_arena_alloc() {
-  alctr_arena_t *arena = arena_create(78);
+  c_arena_t *arena = arena_create(78);
   TEST_ASSERT_NOT_NULL(arena);
   void *ptr = arena_alloc(arena, 12);
   TEST_ASSERT_NOT_NULL(ptr);
@@ -45,7 +45,7 @@ void test_arena_alloc() {
 }
 
 void test_arena_reset() {
-  alctr_arena_t *arena = arena_create(182);
+  c_arena_t *arena = arena_create(182);
   TEST_ASSERT_NOT_NULL(arena);
   char *msg = arena_alloc(arena, 12);
   strncpy(msg, "hello world", 12);
@@ -58,7 +58,7 @@ void test_arena_reset() {
 }
 
 void test_fail_when_full() {
-  alctr_arena_t *arena = arena_create(sizeof(int) * 4);
+  c_arena_t *arena = arena_create(sizeof(int) * 4);
   TEST_ASSERT_NOT_NULL(arena);
   int *ptr1 = (int*)arena_alloc(arena, sizeof(int) * 2);
   TEST_ASSERT_NOT_NULL(ptr1);
@@ -70,7 +70,7 @@ void test_fail_when_full() {
 }
 
 void test_integrity() {
-  alctr_arena_t *arena = arena_create(1024);
+  c_arena_t *arena = arena_create(1024);
   char *msg1 = arena_alloc(arena, 12);
   strncpy(msg1, "hello world", 12);
   TEST_ASSERT_TRUE(strncmp(msg1, "hello world", 12) == 0);

@@ -9,7 +9,7 @@
 #include <stddef.h>
 #include <stdalign.h>
 
-typedef struct arena_t alctr_arena_t;
+typedef struct arena_t c_arena_t;
 
 /**
  *
@@ -20,7 +20,7 @@ typedef struct arena_t alctr_arena_t;
  * @param size Number of bytes to allocate.
  * @return Pointer to arena, or NULL on failure.
  */
-alctr_arena_t *arena_create(size_t size);
+c_arena_t *arena_create(size_t size);
 
 /**
  *
@@ -36,7 +36,7 @@ alctr_arena_t *arena_create(size_t size);
  * @note The lifetime of the returned memory is tied to the arena.
  *       Do not free() it manually.
  */
-void *arena_alloc_aligned(alctr_arena_t *arena, size_t size, size_t align);
+void *arena_alloc_aligned(c_arena_t *arena, size_t size, size_t align);
 
 /**
  *
@@ -53,7 +53,7 @@ void *arena_alloc_aligned(alctr_arena_t *arena, size_t size, size_t align);
  *       to be out of memory earlier than expected,
  *       particularly for smaller arenas.
  */
-void *arena_alloc(alctr_arena_t *arena, size_t size);
+void *arena_alloc(c_arena_t *arena, size_t size);
 
 /**
  *
@@ -63,7 +63,7 @@ void *arena_alloc(alctr_arena_t *arena, size_t size);
  *
  * @param arena Pointer to the arena allocator being freed.
  */
-void arena_free(alctr_arena_t *arena);
+void arena_free(c_arena_t *arena);
 
 /**
  *
@@ -74,6 +74,6 @@ void arena_free(alctr_arena_t *arena);
  *
  * @note Do not use previously assigned memory after a reset.
  */
-void arena_reset(alctr_arena_t *arena);
+void arena_reset(c_arena_t *arena);
 
 #endif
