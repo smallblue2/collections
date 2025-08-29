@@ -7,13 +7,13 @@ void setUp(void) {}
 void tearDown(void) {}
 
 void test_arena_create() {
-  c_arena_t *arena = arena_create(1024);
+  c_arena_t *arena = arena_create_flags(1024, ARENA_NO_FLAGS);
   TEST_ASSERT_NOT_NULL(arena);
   arena_free(arena);
 }
 
 void test_arena_alloc_aligned_8() {
-  c_arena_t *arena = arena_create(678);
+  c_arena_t *arena = arena_create_flags(678, ARENA_NO_FLAGS);
   TEST_ASSERT_NOT_NULL(arena);
   void *ptr1 = arena_alloc_aligned(arena, 12, 8);
   TEST_ASSERT_NOT_NULL(ptr1);
@@ -25,7 +25,7 @@ void test_arena_alloc_aligned_8() {
 }
 
 void test_arena_alloc_aligned_4() {
-  c_arena_t *arena = arena_create(54);
+  c_arena_t *arena = arena_create_flags(54, ARENA_NO_FLAGS);
   TEST_ASSERT_NOT_NULL(arena);
   void *ptr1 = arena_alloc_aligned(arena, 12, 4);
   TEST_ASSERT_NOT_NULL(ptr1);
@@ -37,7 +37,7 @@ void test_arena_alloc_aligned_4() {
 }
 
 void test_arena_alloc() {
-  c_arena_t *arena = arena_create(78);
+  c_arena_t *arena = arena_create_flags(78, ARENA_NO_FLAGS);
   TEST_ASSERT_NOT_NULL(arena);
   void *ptr = arena_alloc(arena, 12);
   TEST_ASSERT_NOT_NULL(ptr);
@@ -45,7 +45,7 @@ void test_arena_alloc() {
 }
 
 void test_arena_reset() {
-  c_arena_t *arena = arena_create(182);
+  c_arena_t *arena = arena_create_flags(182, ARENA_NO_FLAGS);
   TEST_ASSERT_NOT_NULL(arena);
   char *msg = arena_alloc(arena, 12);
   strncpy(msg, "hello world", 12);
@@ -58,7 +58,7 @@ void test_arena_reset() {
 }
 
 void test_fail_when_full() {
-  c_arena_t *arena = arena_create(sizeof(int) * 4);
+  c_arena_t *arena = arena_create_flags(sizeof(int) * 4, ARENA_NO_FLAGS);
   TEST_ASSERT_NOT_NULL(arena);
   int *ptr1 = (int*)arena_alloc(arena, sizeof(int) * 2);
   TEST_ASSERT_NOT_NULL(ptr1);
@@ -82,7 +82,7 @@ void test_integrity() {
 }
 
 void test_arena_grow() {
-  c_arena_t *arena = arena_create(4);
+  c_arena_t *arena = arena_create_flags(4, ARENA_GROWABLE);
   int *nums = arena_alloc(arena, sizeof(int) * 12);
   TEST_ASSERT_NOT_NULL(nums);
   arena_free(arena);
@@ -95,7 +95,7 @@ int main(void) {
   RUN_TEST(test_arena_alloc_aligned_8);
   RUN_TEST(test_arena_create);
   RUN_TEST(test_arena_reset);
-  // RUN_TEST(test_fail_when_full);
+  RUN_TEST(test_fail_when_full);
   RUN_TEST(test_integrity);
   RUN_TEST(test_arena_grow);
   return UNITY_END();

@@ -7,7 +7,26 @@
 #include <stdlib.h>
 #include <string.h>
 
+#define ARENA_NO_FLAGS 0
+#define ARENA_DEFAULT_FLAGS ARENA_NO_FLAGS
+#define ARENA_GROWABLE 0b1
+#define ARENA_PRINT_DEBUG 0b10
+#define ARENA_EXIT_ON_ERROR 0b100
+
 typedef struct arena_t c_arena_t;
+
+/**
+ *
+ * @brief Creates a new memory arena.
+ *
+ * This arena is used for grouping memory lifetimes and simplifying heap memory management.
+ * Uses default flags.
+ *
+ * @param size Number of bytes to allocate.
+ * @param flags Various options for the behaviour of the arena.
+ * @return Pointer to arena, or NULL on failure.
+ */
+c_arena_t *arena_create(size_t size);
 
 /**
  *
@@ -16,9 +35,10 @@ typedef struct arena_t c_arena_t;
  * This arena is used for grouping memory lifetimes and simplifying heap memory management.
  *
  * @param size Number of bytes to allocate.
+ * @param flags Various options for the behaviour of the arena.
  * @return Pointer to arena, or NULL on failure.
  */
-c_arena_t *arena_create(size_t size);
+c_arena_t *arena_create_flags(size_t size, int flags);
 
 /**
  *

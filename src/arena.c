@@ -1,5 +1,7 @@
 #include "../include/collections/arena.h"
 
+#define FLAG_ENABLED(arena, flag) ((arena->flags & flag) == flag)
+
 typedef struct arena_t arena_t;
 typedef struct mem_node mem_node;
 
@@ -11,6 +13,7 @@ struct mem_node {
 };
 
 struct arena_t {
+  int flags;
   void *pos;
   mem_node *head;
   mem_node *cur;
@@ -36,15 +39,24 @@ mem_node *create_memory_node(size_t size) {
 }
 
 arena_t *arena_create(size_t size) {
+  return arena_create_flags(size, ARENA_DEFAULT_FLAGS);
+}
+
+arena_t *arena_create_flags(size_t size, int flags) {
   arena_t *new_arena = (arena_t *)malloc(sizeof(arena_t));
   if (new_arena == NULL) {
+    if ((flags & ARENA_PRINT_DEBUG) == ARENA_PRINT_DEBUG) printf("ARENA : Failed to allocate arena struct!\n");
+    if ((flags & ARENA_EXIT_ON_ERROR) == ARENA_EXIT_ON_ERROR) exit(1);
     return NULL;
   }
   new_arena->head = create_memory_node(size);
   if (new_arena->head == NULL) {
     free(new_arena);
+    if ((flags & ARENA_PRINT_DEBUG) == ARENA_PRINT_DEBUG) printf("ARENA : Failed to create initial arena memory node!\n");
+    if ((flags & ARENA_EXIT_ON_ERROR) == ARENA_EXIT_ON_ERROR) exit(1);
     return NULL;
   }
+  new_arena->flags = flags;
   new_arena->cur = new_arena->head;
   new_arena->pos = new_arena->cur->memory;
   new_arena->size = size;
@@ -61,7 +73,9 @@ void arena_free(arena_t *arena) {
     current = current->next;
     free(prev);
   }
+  int flags = arena->flags;
   free(arena);
+  if ((flags & ARENA_PRINT_DEBUG) == ARENA_PRINT_DEBUG) printf("ARENA : Free'd!\n");
   return;
 }
 
@@ -77,9 +91,11 @@ bool is_power_of_2(size_t n) {
 
 void *arena_alloc_aligned(arena_t *arena, size_t size, size_t align) {
   // Ensure it's a power of 2
+  // Not doing ARENA_EXIT_ON_ERROR as it's a simple mis-use error
   if (!is_power_of_2(align)) { return NULL; }
 
-  printf("Allocating!\n");
+  if (FLAG_ENABLED(arena, ARENA_PRINT_DEBUG)) printf("ARENA : Trying to assign %lu with %lu alignment\n", size, align);
+
   mem_node *current = arena->cur;
 
   // Figure out how much we need including alignment
@@ -89,10 +105,14 @@ void *arena_alloc_aligned(arena_t *arena, size_t size, size_t align) {
    
   // Check if we have space in the current mem_node
   if (current->size < total_size_required + current->used) {
-    printf("Not enough space!\n");
+    if (FLAG_ENABLED(arena, ARENA_PRINT_DEBUG)) printf("ARENA : Not enough space!\n");
+    if (!FLAG_ENABLED(arena, ARENA_GROWABLE)) {
+      if (FLAG_ENABLED(arena, ARENA_EXIT_ON_ERROR)) exit(1);
+      return NULL;
+    }
     // AS the arena can be reset, check if we have a next node already.
     if (current->next != NULL) {
-      printf("Next node already exists!\n");
+      if (FLAG_ENABLED(arena, ARENA_PRINT_DEBUG)) printf("ARENA : Next node already exists!\n");
       // Signify we've used the entire block
       arena->used += current->size - current->used;
       current->used = current->size;
@@ -100,21 +120,23 @@ void *arena_alloc_aligned(arena_t *arena, size_t size, size_t align) {
       // Move to the next block
       arena->cur = current->next;
       arena->pos = arena->cur->memory;
-      printf("Moved to next node!\n");
+      if (FLAG_ENABLED(arena, ARENA_PRINT_DEBUG)) printf("ARENA : Moved to next memory node!\n");
 
       // Try again
       return arena_alloc_aligned(arena, size, align);
     }
     
-    printf("Creating a new node!\n");
+    if (FLAG_ENABLED(arena, ARENA_PRINT_DEBUG)) printf("ARENA : Creating a new memory node!\n");
     // Create a new mem_node, twice the size
     size_t extension = current->size*2;
     mem_node *new_node = create_memory_node(extension);
     if (new_node == NULL) {
+      if (FLAG_ENABLED(arena, ARENA_PRINT_DEBUG)) printf("ARENA : Failed to create memory node");
+      if (FLAG_ENABLED(arena, ARENA_EXIT_ON_ERROR)) exit(1);
       return NULL;
     }
 
-    printf("Updating old node to suggest it's full\n");
+    if (FLAG_ENABLED(arena, ARENA_PRINT_DEBUG)) printf("ARENA : Updating old memory node to suggest it's full\n");
 
     // Signify we've used the entire block
     arena->used += current->size - current->used;
@@ -126,7 +148,7 @@ void *arena_alloc_aligned(arena_t *arena, size_t size, size_t align) {
     arena->cur->next = new_node;
     arena->cur = new_node;
     arena->pos = arena->cur->memory;
-    printf("Moved to next node!\n");
+    if (FLAG_ENABLED(arena, ARENA_PRINT_DEBUG)) printf("ARENA : Moved to next memory node!\n");
 
     // Try again
     return arena_alloc_aligned(arena, size, align);
@@ -144,7 +166,6 @@ void *arena_alloc(arena_t *arena, size_t size) {
   return arena_alloc_aligned(arena, size, alignof(max_align_t));
 }
 
-
 void arena_reset(arena_t *arena) {
   // Reset the backing memory nodes
   for (mem_node *cur = arena->head; cur != NULL; cur = cur->next) {
@@ -159,10 +180,11 @@ void arena_reset(arena_t *arena) {
   // Reset arena metadata
   arena->used = 0;
 
-  printf("RESET!\n");
+  if (FLAG_ENABLED(arena, ARENA_PRINT_DEBUG)) printf("ARENA : Reset!\n");
 }
 
-void arena_print_stats(arena_t *arena) {
+// Not publicly exposed
+void __arena_print_stats(arena_t *arena) {
   printf("================== STATS ==================\n");
   printf("ARENA:\n");
   printf("\tused: %lu\n\tsize: %lu\n\tnodes:\n", arena->used, arena->size);
