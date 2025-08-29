@@ -14,7 +14,7 @@ This is mostly for my own learning in the underlying implementation of collectio
 
 Prerequisites:
 
- - `meson`
+ - `meson>=1.6.0`
 
 To install:
 
