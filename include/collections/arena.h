@@ -3,9 +3,11 @@
 
 #include <stddef.h>
 #include <stdint.h>
+#include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <stdalign.h>
 
 #define ARENA_NO_FLAGS 0
 #define ARENA_DEFAULT_FLAGS ARENA_NO_FLAGS

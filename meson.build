@@ -1,5 +1,5 @@
 project('collections', 'c',
-  version : '0.0.1',
+  version : '0.0.2',
   meson_version : '>=1.6.0',
   default_options : [
     'c_std=c2x',
@@ -12,35 +12,35 @@ project_description = 'A library of custom collections for better developer expe
 project_url = 'git@github.com:smallblue2/collections.git'
 
 # build options
-# install_headers = get_option('install_headers')
+install_headers = get_option('install_headers')
 
 sources = [
   'src/arena.c'
 ]
 
-# collections_static_lib = static_library('collections',
-#   sources,
-#   install: true
-# )
+collections_static_lib = static_library('collections',
+  sources,
+  install: true
+)
 
-# collections_shared_lib = library('collections',
-#   sources,
-#   install: true
-# )
+collections_shared_lib = library('collections',
+  sources,
+  install: true
+)
 
-# if install_headers
-#   install_headers('include/collections/arena.h', subdir: 'collections')
-# endif
+if install_headers
+  install_headers('include/collections/arena.h', subdir: 'collections')
+endif
 
-# pkgconfig = import('pkgconfig')
+pkgconfig = import('pkgconfig')
 
-# pkgconfig.generate(
-#   name: 'collections',
-#   description: project_description,
-#   version: meson.project_version(),
-#   libraries: [collections_shared_lib],
-#   subdirs: 'collections'
-# )
+pkgconfig.generate(
+  name: 'collections',
+  description: project_description,
+  version: meson.project_version(),
+  libraries: [collections_shared_lib],
+  subdirs: 'collections'
+)
 
 # Tests
 unity_dirs = include_directories('tests/unity')
@@ -52,5 +52,3 @@ arena_test_exe = executable('arena_test',
 )
 
 test('Arena tests', arena_test_exe)
-
-exe = executable('main', sources)
