@@ -1,4 +1,5 @@
 #include <stddef.h>
+#include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -64,15 +65,33 @@ void arena_free(arena_t *arena) {
     free(prev);
   }
   free(arena);
-  arena = NULL;
   return;
 }
 
-void *arena_alloc(arena_t *arena, size_t size) {
+void *align_ptr(void *ptr, size_t align) {
+  uintptr_t addr = (uintptr_t)ptr;
+  uintptr_t aligned = (addr + align - 1) & ~(align - 1);
+  return (void*)aligned;
+}
+
+bool is_power_of_2(size_t n) {
+  return n > 0 && (n  & (n - 1)) == 0;
+}
+
+void *arena_alloc_aligned(arena_t *arena, size_t size, size_t align) {
+  // Ensure it's a power of 2
+  if (!is_power_of_2(align)) { return NULL; }
+
   printf("Allocating!\n");
   mem_node *current = arena->cur;
+
+  // Figure out how much we need including alignment
+  void *aligned_arena_pos = align_ptr(arena->pos, align);
+  size_t padding_required = (uintptr_t)aligned_arena_pos - (uintptr_t)arena->pos;
+  size_t total_size_required = size + padding_required;
+   
   // Check if we have space in the current mem_node
-  if (current->size < current->used + size) {
+  if (current->size < total_size_required + current->used) {
     printf("Not enough space!\n");
     // AS the arena can be reset, check if we have a next node already.
     if (current->next != NULL) {
@@ -87,7 +106,7 @@ void *arena_alloc(arena_t *arena, size_t size) {
       printf("Moved to next node!\n");
 
       // Try again
-      return arena_alloc(arena, size);
+      return arena_alloc_aligned(arena, size, align);
     }
     
     printf("Creating a new node!\n");
@@ -113,24 +132,27 @@ void *arena_alloc(arena_t *arena, size_t size) {
     printf("Moved to next node!\n");
 
     // Try again
-    return arena_alloc(arena, size);
+    return arena_alloc_aligned(arena, size, align);
   }
 
   // Save the pointer before moving it
-  void *new_ptr = arena->pos;
-  arena->pos += size;
-  arena->used += size;
-  arena->cur->used += size;
+  arena->pos += total_size_required;
+  arena->used += total_size_required;
+  arena->cur->used += total_size_required;
 
-  return new_ptr;
+  return aligned_arena_pos;
 }
+
+void *arena_alloc(arena_t *arena, size_t size) {
+  return arena_alloc_aligned(arena, size, alignof(max_align_t));
+}
+
 
 void arena_reset(arena_t *arena) {
   // Reset the backing memory nodes
-  for (mem_node *cur = arena->head; cur != NULL;) {
+  for (mem_node *cur = arena->head; cur != NULL; cur = cur->next) {
     memset(cur->memory, 0, cur->size);
     cur->used = 0;
-    cur = cur->next;
   }
 
   // Set pointer back to the very start
@@ -165,7 +187,7 @@ int main(void) {
   strncpy(zoe, "zoe", 4);
   arena_print_stats(arena);
 
-  char *niall = arena_alloc(arena, 6);
+  char *niall = arena_alloc_aligned(arena, 6, 8);
   strncpy(niall, "niall", 6);
   arena_print_stats(arena);
 
