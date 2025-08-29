@@ -43,14 +43,14 @@ sources = [
 # )
 
 # Tests
-# unity_dirs = include_directories('tests/unity')
-# arena_test_exe = executable('arena_test',
-#   'src/arena.c',
-#   'tests/test_arena.c',
-#   'tests/unity/src/unity.c',
-#   include_directories: [unity_dirs, '.'],
-# )
+unity_dirs = include_directories('tests/unity')
+arena_test_exe = executable('arena_test',
+  'src/arena.c',
+  'tests/test_arena.c',
+  'tests/unity/src/unity.c',
+  include_directories: [unity_dirs, '.'],
+)
 
-# test('Arena tests', arena_test_exe)
+test('Arena tests', arena_test_exe)
 
 exe = executable('main', sources)

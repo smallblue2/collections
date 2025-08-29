@@ -1,13 +1,11 @@
 #ifndef ARENAH
 #define ARENAH
 
+#include <stddef.h>
+#include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include <stddef.h>
 #include <string.h>
-#include <pthread.h>
-#include <stddef.h>
-#include <stdalign.h>
 
 typedef struct arena_t c_arena_t;
 

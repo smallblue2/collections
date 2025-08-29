@@ -81,6 +81,13 @@ void test_integrity() {
   arena_free(arena);
 }
 
+void test_arena_grow() {
+  c_arena_t *arena = arena_create(4);
+  int *nums = arena_alloc(arena, sizeof(int) * 12);
+  TEST_ASSERT_NOT_NULL(nums);
+  arena_free(arena);
+}
+
 int main(void) {
   UNITY_BEGIN();
   RUN_TEST(test_arena_alloc);
@@ -88,7 +95,8 @@ int main(void) {
   RUN_TEST(test_arena_alloc_aligned_8);
   RUN_TEST(test_arena_create);
   RUN_TEST(test_arena_reset);
-  RUN_TEST(test_fail_when_full);
+  // RUN_TEST(test_fail_when_full);
   RUN_TEST(test_integrity);
+  RUN_TEST(test_arena_grow);
   return UNITY_END();
 }

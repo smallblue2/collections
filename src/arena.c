@@ -1,8 +1,5 @@
-#include <stddef.h>
-#include <stdint.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
+#include "../include/collections/arena.h"
+
 typedef struct arena_t arena_t;
 typedef struct mem_node mem_node;
 
@@ -179,40 +176,40 @@ void arena_print_stats(arena_t *arena) {
   printf("===========================================\n");
 }
 
-int main(void) {
-  arena_t *arena = arena_create(4);
-  printf("Created!\n");
+// int main(void) {
+//   arena_t *arena = arena_create(4);
+//   printf("Created!\n");
 
-  char *zoe = arena_alloc(arena, 4);
-  strncpy(zoe, "zoe", 4);
-  arena_print_stats(arena);
+//   char *zoe = arena_alloc(arena, 4);
+//   strncpy(zoe, "zoe", 4);
+//   arena_print_stats(arena);
 
-  char *niall = arena_alloc_aligned(arena, 6, 8);
-  strncpy(niall, "niall", 6);
-  arena_print_stats(arena);
+//   char *niall = arena_alloc_aligned(arena, 6, 8);
+//   strncpy(niall, "niall", 6);
+//   arena_print_stats(arena);
 
-  char *hw = arena_alloc(arena, 12);
-  strncpy(hw, "hello world", 12);
-  arena_print_stats(arena);
+//   char *hw = arena_alloc(arena, 12);
+//   strncpy(hw, "hello world", 12);
+//   arena_print_stats(arena);
 
-  arena_reset(arena);
+//   arena_reset(arena);
 
-  char *zoe1 = arena_alloc(arena, 4);
-  strncpy(zoe1, "zoe", 4);
-  arena_print_stats(arena);
+//   char *zoe1 = arena_alloc(arena, 4);
+//   strncpy(zoe1, "zoe", 4);
+//   arena_print_stats(arena);
 
-  char *niall1 = arena_alloc(arena, 6);
-  strncpy(niall1, "niall", 6);
-  arena_print_stats(arena);
+//   char *niall1 = arena_alloc(arena, 6);
+//   strncpy(niall1, "niall", 6);
+//   arena_print_stats(arena);
 
-  char *hw1 = arena_alloc(arena, 12);
-  strncpy(hw1, "hello world", 12);
-  arena_print_stats(arena);
+//   char *hw1 = arena_alloc(arena, 12);
+//   strncpy(hw1, "hello world", 12);
+//   arena_print_stats(arena);
 
-  printf("0: %s\n1: %s\n2: %s\n", zoe, niall, hw);
+//   printf("0: %s\n1: %s\n2: %s\n", zoe, niall, hw);
 
-  arena_free(arena);
-  printf("Freed!\n");
+//   arena_free(arena);
+//   printf("Freed!\n");
 
-  return 0;
-}
+//   return 0;
+// }
