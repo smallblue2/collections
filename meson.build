@@ -15,40 +15,44 @@ project_url = 'git@github.com:smallblue2/collections.git'
 install_headers = get_option('install_headers')
 
 sources = [
-  'src/arena.c'
+  'src/arena.c',
+  'src/array.c'
 ]
 
-collections_static_lib = static_library('collections',
-  sources,
-  install: true
-)
+# collections_static_lib = static_library('collections',
+#   sources,
+#   install: true
+# )
 
-collections_shared_lib = library('collections',
-  sources,
-  install: true
-)
+# collections_shared_lib = library('collections',
+#   sources,
+#   install: true
+# )
 
-if install_headers
-  install_headers('include/collections/arena.h', subdir: 'collections')
-endif
+# if install_headers
+#   install_headers('include/collections/arena.h', subdir: 'collections')
+#   install_headers('include/collections/dyn-array.h', subdir: 'collections')
+# endif
 
-pkgconfig = import('pkgconfig')
+# pkgconfig = import('pkgconfig')
 
-pkgconfig.generate(
-  name: 'collections',
-  description: project_description,
-  version: meson.project_version(),
-  libraries: [collections_shared_lib],
-  subdirs: 'collections'
-)
+# pkgconfig.generate(
+#   name: 'collections',
+#   description: project_description,
+#   version: meson.project_version(),
+#   libraries: [collections_shared_lib],
+#   subdirs: 'collections'
+# )
 
 # Tests
-unity_dirs = include_directories('tests/unity')
-arena_test_exe = executable('arena_test',
-  'src/arena.c',
-  'tests/test_arena.c',
-  'tests/unity/src/unity.c',
-  include_directories: [unity_dirs, '.'],
-)
+# unity_dirs = include_directories('tests/unity')
+# arena_test_exe = executable('arena_test',
+#   'src/arena.c',
+#   'tests/test_arena.c',
+#   'tests/unity/src/unity.c',
+#   include_directories: [unity_dirs, '.'],
+# )
 
-test('Arena tests', arena_test_exe)
+# test('Arena tests', arena_test_exe)
+
+exe = executable('main', sources)
