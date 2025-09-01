@@ -16,7 +16,7 @@ install_headers = get_option('install_headers')
 
 sources = [
   'src/arena.c',
-  'src/array.c'
+  'src/parray.c'
 ]
 
 # collections_static_lib = static_library('collections',
