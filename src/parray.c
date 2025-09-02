@@ -46,6 +46,7 @@ void parray_free(parray_t *parray) {
   }
   free(parray->items);
   free(parray);
+  parray = NULL;
 }
 
 bool __parray_grow(parray_t *parray) {
@@ -134,7 +135,7 @@ const void *parray_insert(parray_t *parray, size_t index, const void *item, size
 // User has ownership over this now
 void *parray_pop(parray_t *parray, size_t index) {
   // Ensure we're within bounds
-  if (index < 0 || parray->length < index) {
+  if (index < 0 || parray->length <= index) {
     return NULL;
   }
 
@@ -151,32 +152,4 @@ void *parray_pop(parray_t *parray, size_t index) {
   memmove(&parray->items[index], &parray->items[index + 1], sizeof(void*) * (parray->length - index));
 
   return to_remove;
-}
-
-int main(void) {
-  parray_t *myarr = parray_create();
-  
-  for (int i = 0; i < 100; i++) {
-    printf("appending '%d'...\n", i);
-    const int *ret = (int*)parray_append(myarr, &i, sizeof i);
-    if (ret == NULL) {
-      printf("FAILED TO APPEND '%d'!\n", i);
-    }
-    printf("Yippee!!!\n");
-  }
-
-  parray_insert(myarr, 0, "MEOW", strlen("MEOW") + 1);
-
-  char *msg = (char*)parray_pop(myarr, 0);
-  printf("msg: %s\n", msg);
-  free(msg);
-
-  for (int i = 0; i < myarr->length; i++) {
-    if (i == -1) printf("arr[%d] = %s\n", i, (char*)parray_get(myarr, i));
-    else printf("arr[%d] = %d\n", i, *(int*)parray_get(myarr, i));
-  }
-
-  printf("Freeing array\n");
-  parray_free(myarr);  
-  return 0;
 }
