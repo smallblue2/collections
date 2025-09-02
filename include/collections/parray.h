@@ -75,7 +75,7 @@ const void *parray_get(c_parray_t *parray, size_t index);
  * @param parray The pointer array from which to retrieve the length of.
  * @return The length of the pointer array.
  */
-size_t parray_length(c_parray_t *array);
+size_t parray_length(c_parray_t *parray);
 
 /**
  *
@@ -90,7 +90,21 @@ size_t parray_length(c_parray_t *array);
  * @param size The size of the value to copy from `item`.
  * @return NULL on error, or the pointer array's reference of the copied inserted value.
  */
-const void *parray_insert(c_parray_t *array, size_t index, const void *item, size_t size);
-void *parray_pop(c_parray_t *array, size_t index);
+const void *parray_insert(c_parray_t *parray, size_t index, const void *item, size_t size);
+
+/**
+ *
+ * @brief Pops an item from the pointer array.
+ *
+ * Removes an item from the pointer array, and moves everything
+ * to occupy the empty space.
+ *
+ * @param parray The pointer array to pop from.
+ * @param index The index to pop from.
+ * @return NULL on error, or the removed item.
+ *
+ * @note You must free the returned item, as the array no longer owns it.
+ */
+void *parray_pop(c_parray_t *parray, size_t index);
 
 #endif
