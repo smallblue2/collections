@@ -8,7 +8,8 @@ This is mostly for my own learning in the underlying implementation of collectio
 
 ## Current Collections
 
- - Arena (Linear Allocator)
+ - Arena (Growable) = `include/collections/arena.h`
+ - Pointer Array = `include/collections/parray.h`
 
 ## Install
 
