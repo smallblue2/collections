@@ -6,19 +6,19 @@ typedef struct arena_t arena_t;
 typedef struct mem_node mem_node;
 
 struct mem_node {
-  void *memory;
-  mem_node *next;
-  size_t size;
-  size_t used;
+  void *memory; // 8
+  mem_node *next; // 8
+  size_t size; // 8
+  size_t used; // 8
 };
 
 struct arena_t {
-  int flags;
-  void *pos;
-  mem_node *head;
-  mem_node *cur;
-  size_t size;
-  size_t used;
+  void *pos; // 8
+  mem_node *head; // 8
+  mem_node *cur; // 8
+  size_t size; // 8
+  size_t used; // 8
+  int flags; // 4
 };
 
 mem_node *create_memory_node(size_t size) {
