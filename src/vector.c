@@ -1,8 +1,4 @@
 #include "../include/collections/vector.h"
-#include <stdio.h>
-#include <stddef.h>
-#include <stdlib.h>
-#include <string.h>
 
 // Over-allocation strategy from CPython list implementation
 // A mild over-allocation strategy, but is enough to give linear-time
@@ -45,39 +41,44 @@ void vector_free(vector_t *vector) {
   free(vector);
 }
 
-void *vector_set(vector_t *vector, size_t index, void *item) {
-  if (vector == NULL) return NULL;
+int vector_set(vector_t *vector, size_t index, const void *item) {
+  if (vector == NULL) return -1;
+  if (item == NULL) return -1;
 
   // size_t cannot be negative
-  if (index >= vector->size) return NULL;
+  if (index >= vector->size) return -1;
 
   char *memptr = (char*)vector->mem;
   // Copy it in
   memcpy(&memptr[index * vector->elem_size], item, vector->elem_size);
 
-  return &memptr[index];
+  return 0;
 }
 
-void *vector_get(vector_t *vector, size_t index) {
-  if (vector == NULL) return NULL;
+int vector_get(const vector_t *vector, size_t index, void *out) {
+  if (vector == NULL) return -1;
+  if (out == NULL) return -1;
 
-  if (index >= vector->size) return NULL;
+  if (index >= vector->size) return -1;
 
   char *memptr = (char*)vector->mem;
-  return &memptr[index * vector->elem_size];
+  memcpy(out, &memptr[index * vector->elem_size], vector->elem_size);
+
+  return 0;
 }
 
-void *vector_insert(vector_t *vector, size_t index, const void *item) {
-  if (vector == NULL) return NULL;
+int vector_insert(vector_t *vector, size_t index, const void *item) {
+  if (vector == NULL) return -1;
+  if (item == NULL) return -1;
 
   // size_t cannot be negative
-  if (vector->size < index) return NULL;
+  if (vector->size < index) return -1;
 
   if (vector->capacity == vector->size) {
     // Need to resize
     size_t grow_to = VECTOR_GROW(vector->capacity);
     void *new_mem = realloc(vector->mem, grow_to * vector->elem_size);
-    if (new_mem == NULL) return NULL;
+    if (new_mem == NULL) return -1;
     vector->mem = new_mem;
     vector->capacity = grow_to;
   }
@@ -91,31 +92,33 @@ void *vector_insert(vector_t *vector, size_t index, const void *item) {
   memcpy(&memptr[index * vector->elem_size], item, vector->elem_size);
   vector->size++;
 
-  return &memptr[vector->elem_size * index];
+  return 0;
 }
 
-void *vector_remove(vector_t *vector, size_t index) {
-  if (vector == NULL) return NULL;
-  if (index >= vector->size) return NULL;
-  if (vector->size == 0) return NULL;
+int vector_remove(vector_t *vector, size_t index, void *out) {
+  if (vector == NULL) return -1;
+  if (vector->size == 0) return -1;
+  if (index >= vector->size) return -1;
 
   char *memptr = (char*)vector->mem;
-  void *item = &memptr[index * vector->elem_size];
+  if (out != NULL) {
+    memcpy(out, &memptr[index * vector->elem_size], vector->elem_size);
+  }
 
   // Move things back to fill the empty space
   memmove(&memptr[index * vector->elem_size], &memptr[(index + 1) * vector->elem_size], (vector->size - index - 1) * vector->elem_size);
 
   vector->size--;
-  
-  return item;
+
+  return 0;
 }
 
-void *vector_push_back(vector_t *vector, void *item) {
+int vector_push_back(vector_t *vector, const void *item) {
   return vector_insert(vector, vector->size, item);
 }
 
-void *vector_pop_back(vector_t *vector) {
-  return vector_remove(vector, vector->size - 1);
+int vector_pop_back(vector_t *vector, void *out) {
+  return vector_remove(vector, vector->size - 1, out);
 }
 
 int vector_reserve(vector_t *vector, size_t capacity) {
@@ -156,17 +159,17 @@ int vector_resize(vector_t *vector, size_t size, const void *default_value) {
   return 0;
 }
 
-size_t vector_size(vector_t *vector) {
+size_t vector_size(const vector_t *vector) {
   if (vector == NULL) return 0;
   return vector->size;
 }
 
-size_t vector_capacity(vector_t *vector) {
+size_t vector_capacity(const vector_t *vector) {
   if (vector == NULL) return 0;
   return vector->capacity;
 }
 
-bool vector_empty(vector_t *vector) {
+bool vector_empty(const vector_t *vector) {
   if (vector == NULL) return false;
   return vector->size == 0;
 }
