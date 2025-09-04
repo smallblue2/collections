@@ -50,9 +50,9 @@ void parray_free(c_parray_t *parray);
  * @param parray The pointer array to append to.
  * @param item The item whos value to append.
  * @param size The size of the item's value to append.
- * @return NULL on error, or the pointer array's reference of the new value.
+ * @return 0 on success, -1 on error.
  */
-const void *parray_append(c_parray_t *parray, const void *item, const size_t size);
+int parray_append(c_parray_t *parray, const void *item, const size_t size);
 
 /**
  *
@@ -88,9 +88,9 @@ size_t parray_length(c_parray_t *parray);
  * @param index The index to insert to.
  * @param item The item to copy the value from and insert.
  * @param size The size of the value to copy from `item`.
- * @return NULL on error, or the pointer array's reference of the copied inserted value.
+ * @return 0 on success, -1 on error.
  */
-const void *parray_insert(c_parray_t *parray, size_t index, const void *item, size_t size);
+int parray_insert(c_parray_t *parray, size_t index, const void *item, size_t size);
 
 /**
  *

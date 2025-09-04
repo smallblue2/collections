@@ -13,9 +13,9 @@
 typedef c_parray_t parray_t;
 
 struct parray_t {
-  void **items;
-  size_t length;
-  size_t allocation_size;
+  void **items; // 8
+  size_t length; // 8
+  size_t allocation_size; // 8
 };
 
 parray_t *parray_create() {
@@ -46,35 +46,32 @@ void parray_free(parray_t *parray) {
   }
   free(parray->items);
   free(parray);
-  parray = NULL;
 }
 
-bool __parray_grow(parray_t *parray) {
+int __parray_grow(parray_t *parray) {
   size_t new_capacity = CALCULATE_RESIZE(parray->allocation_size);
   void **new_items = realloc(parray->items, sizeof(void*) * new_capacity);
-  if (new_items == NULL) {
-    return false;
-  }
+  if (new_items == NULL) return -1;
   parray->items = new_items;
   memset(&parray->items[parray->allocation_size], 0, sizeof(void*) * (new_capacity - parray->allocation_size));
   parray->allocation_size = new_capacity;
 
-  return true;
+  return 0;
 }
 
 // Return the item on succesful append, or NULL on error
-const void *parray_append(parray_t *parray, const void *item, const size_t size) {
+int parray_append(parray_t *parray, const void *item, const size_t size) {
   // Allocate memory first incase it fails
   void *new_item = malloc(size);
   if (new_item == NULL) {
-    return NULL;
+    return -1;
   }
 
   // Check if we need to resize
   if (parray->length == parray->allocation_size) {
-    if (!__parray_grow(parray)) {
+    if (__parray_grow(parray) != 0) {
       free(new_item);
-      return NULL;
+      return -1;
     }
   }
 
@@ -84,7 +81,7 @@ const void *parray_append(parray_t *parray, const void *item, const size_t size)
 
   parray->length++;
 
-  return parray->items[parray->length - 1];
+  return 0;
 }
 
 const void *parray_get(parray_t *parray, size_t index) {
@@ -97,10 +94,10 @@ const void *parray_get(parray_t *parray, size_t index) {
 size_t parray_length(parray_t *parray) { return parray->length; };
 
 // Only allows insertion from 0 < length
-const void *parray_insert(parray_t *parray, size_t index, const void *item, size_t size) {
+int parray_insert(parray_t *parray, size_t index, const void *item, size_t size) {
   // Check if the insertion is within bounds
   if (index < 0 || parray->length < index) {
-    return NULL;
+    return -1;
   }
 
   // If it's inserted to the end, it's just an append
@@ -109,14 +106,14 @@ const void *parray_insert(parray_t *parray, size_t index, const void *item, size
   // Allocate memory for new item early incase it fails
   void *new_item = malloc(size);
   if (new_item == NULL) {
-    return NULL;
+    return -1;
   }
 
   // Resize if we need to
   if (parray->length + 1 == parray->allocation_size) {
-    if (!__parray_grow(parray)) {
+    if (__parray_grow(parray) != 0) {
       free(new_item);
-      return NULL;
+      return -1;
     }
   }
 
@@ -129,24 +126,19 @@ const void *parray_insert(parray_t *parray, size_t index, const void *item, size
 
   parray->length += 1;
 
-  return parray->items[index];
+  return 0;
 }
 
 // User has ownership over this now
 void *parray_pop(parray_t *parray, size_t index) {
   // Ensure we're within bounds
   if (index < 0 || parray->length <= index) {
-    return NULL;
+    return 0;
   }
 
   // Keep a reference to the item incase we overwrite the index
   void *to_remove = parray->items[index];
   parray->length--;
-
-  // If it's the final item, we don't have to move any memory
-  if (index == parray->length) {
-    return to_remove;
-  }
 
   // Move the memory back
   memmove(&parray->items[index], &parray->items[index + 1], sizeof(void*) * (parray->length - index));

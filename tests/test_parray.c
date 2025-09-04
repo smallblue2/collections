@@ -15,13 +15,10 @@ void test_parray_get() {
   c_parray_t *parray = parray_create();
   TEST_ASSERT_NOT_NULL(parray);
   int i = 1337;
-  int *ret = (int *)parray_append(parray, &i, sizeof(i));
-  TEST_ASSERT_NOT_NULL(ret);
-  TEST_ASSERT_TRUE(*ret == i);
+  int ok = parray_append(parray, &i, sizeof(i));
+  TEST_ASSERT_TRUE(ok == 0);
   int *got = (int *)parray_get(parray, 0);
   TEST_ASSERT_NOT_NULL(got);
-  TEST_ASSERT_TRUE(*got = *ret);
-  TEST_ASSERT_TRUE(got = ret);
   TEST_ASSERT_TRUE(*got = 1337);
   parray_free(parray);
 }
@@ -44,7 +41,7 @@ void test_parray_length() {
   c_parray_t *parray = parray_create();
   TEST_ASSERT_NOT_NULL(parray);
   for (int i = 0; i < 10; i++) {
-    TEST_ASSERT_NOT_NULL(parray_append(parray, &i, sizeof(i)));
+    TEST_ASSERT_TRUE(parray_append(parray, &i, sizeof(i)) == 0);
   }
   TEST_ASSERT_TRUE(parray_length(parray) == 10);
   parray_free(parray);
@@ -54,14 +51,15 @@ void test_parray_insert() {
   c_parray_t *parray = parray_create();
   TEST_ASSERT_NOT_NULL(parray);
   for (int i = 0; i < 10; i++) {
-    TEST_ASSERT_NOT_NULL(parray_append(parray, &i, sizeof(i)));
+    TEST_ASSERT_TRUE(parray_append(parray, &i, sizeof(i)) == 0);
   }
   const char *msg = "Hello, World!";
   int msg_size = sizeof(char) * (strlen(msg) + 1);
-  const char *insert_got = (char *)parray_insert(parray, 3, msg, msg_size);
-  TEST_ASSERT_NOT_NULL(insert_got);
+  int ok = parray_insert(parray, 3, msg, msg_size);
+  TEST_ASSERT_TRUE(ok == 0);
+  char *insert_got = (char*)parray_get(parray, 3);
   TEST_ASSERT_TRUE(strncmp(msg, insert_got, msg_size) == 0);
-  const char *got = (char *)parray_get(parray, 3);
+  const char *got = (char*)parray_get(parray, 3);
   TEST_ASSERT_TRUE(strncmp(msg, got, msg_size) == 0);
   TEST_ASSERT_TRUE(strncmp("Hello, World!", got, msg_size) == 0);
   parray_free(parray);
@@ -71,7 +69,7 @@ void test_parray_insert_oob() {
   c_parray_t *parray = parray_create();
   TEST_ASSERT_NOT_NULL(parray);
   int tmp = 5;
-  TEST_ASSERT_NULL(parray_insert(parray, 3, &tmp, sizeof(tmp)));
+  TEST_ASSERT_TRUE(parray_insert(parray, 3, &tmp, sizeof(tmp)) == -1);
   parray_free(parray);
 }
 
@@ -79,7 +77,7 @@ void test_parray_pop() {
   c_parray_t *parray = parray_create();
   TEST_ASSERT_NOT_NULL(parray);
   for (int i = 0; i < 12; i++)
-    TEST_ASSERT_NOT_NULL(parray_append(parray, &i, sizeof(i)));
+    TEST_ASSERT_TRUE(parray_append(parray, &i, sizeof(i)) == 0);
   for (int i = 0; i < 12; i++) {
     int *got = (int*)parray_pop(parray, 0);
     TEST_ASSERT_NOT_NULL(got);
