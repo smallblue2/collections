@@ -41,16 +41,16 @@ void vector_free(vector_t *vector) {
   free(vector);
 }
 
-int vector_set(vector_t *vector, size_t index, const void *item) {
+int vector_set(vector_t *vector, size_t index, const void *value) {
   if (vector == NULL) return -1;
-  if (item == NULL) return -1;
+  if (value == NULL) return -1;
 
   // size_t cannot be negative
   if (index >= vector->size) return -1;
 
   char *memptr = (char*)vector->mem;
   // Copy it in
-  memcpy(&memptr[index * vector->elem_size], item, vector->elem_size);
+  memcpy(&memptr[index * vector->elem_size], value, vector->elem_size);
 
   return 0;
 }
@@ -67,9 +67,9 @@ int vector_get(const vector_t *vector, size_t index, void *out) {
   return 0;
 }
 
-int vector_insert(vector_t *vector, size_t index, const void *item) {
+int vector_insert(vector_t *vector, size_t index, const void *value) {
   if (vector == NULL) return -1;
-  if (item == NULL) return -1;
+  if (value == NULL) return -1;
 
   // size_t cannot be negative
   if (vector->size < index) return -1;
@@ -89,7 +89,7 @@ int vector_insert(vector_t *vector, size_t index, const void *item) {
   memmove(&memptr[vector->elem_size * (index + 1)], &memptr[vector->elem_size * index], vector->elem_size * (vector->size - index));
 
   // Copy the value of the item in
-  memcpy(&memptr[index * vector->elem_size], item, vector->elem_size);
+  memcpy(&memptr[index * vector->elem_size], value, vector->elem_size);
   vector->size++;
 
   return 0;
@@ -113,8 +113,8 @@ int vector_remove(vector_t *vector, size_t index, void *out) {
   return 0;
 }
 
-int vector_push_back(vector_t *vector, const void *item) {
-  return vector_insert(vector, vector->size, item);
+int vector_push_back(vector_t *vector, const void *value) {
+  return vector_insert(vector, vector->size, value);
 }
 
 int vector_pop_back(vector_t *vector, void *out) {
@@ -146,6 +146,7 @@ int vector_resize(vector_t *vector, size_t size, const void *default_value) {
 
   // If we're expanding
   if (size > vector->size) {
+    if (default_value == NULL) return -1;
     // Initialise everything to the default value
     char *memptr = (char*)vector->mem;
     for (size_t i = vector->size; i < size; i++) {
