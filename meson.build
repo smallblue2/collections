@@ -33,6 +33,7 @@ collections_shared_lib = library('collections',
 if install_headers
   install_headers('include/collections/arena.h', subdir: 'collections')
   install_headers('include/collections/parray.h', subdir: 'collections')
+  install_headers('include/collections/vector.h', subdir: 'collections')
 endif
 
 pkgconfig = import('pkgconfig')
