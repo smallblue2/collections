@@ -6,31 +6,33 @@ void setUp(void) {}
 void tearDown(void) {}
 
 void test_parray_create() {
-  c_parray_t *parray = parray_create();
+  c_parray_t *parray = parray_create(NULL);
   TEST_ASSERT_NOT_NULL(parray);
   parray_free(parray);
 }
 
 void test_parray_get() {
-  c_parray_t *parray = parray_create();
+  c_parray_t *parray = parray_create(NULL);
   TEST_ASSERT_NOT_NULL(parray);
   int i = 1337;
-  int ok = parray_append(parray, &i, sizeof(i));
-  TEST_ASSERT_TRUE(ok == 0);
-  int *got = (int *)parray_get(parray, 0);
+  TEST_ASSERT_TRUE(parray_append(parray, &i) == 0);
+  const int *got = (const int *)parray_get(parray, 0);
   TEST_ASSERT_NOT_NULL(got);
-  TEST_ASSERT_TRUE(*got = 1337);
+  TEST_ASSERT_TRUE(*got == 1337);
   parray_free(parray);
 }
 
 void test_parray_append() {
-  c_parray_t *parray = parray_create();
+  c_parray_t *parray = parray_create(free);
   TEST_ASSERT_NOT_NULL(parray);
   for (int i = 0; i < 10; i++) {
-    parray_append(parray, &i, sizeof(i));
+    int *new_ptr = (int*)malloc(sizeof(int));
+    TEST_ASSERT_NOT_NULL(new_ptr);
+    *new_ptr = i;
+    TEST_ASSERT_TRUE(parray_append(parray, new_ptr) == 0);
   }
   for (int i = 0; i < 10; i++) {
-    int *got = (int *)parray_get(parray, i);
+    const int *got = (const int *)parray_get(parray, i);
     TEST_ASSERT_NOT_NULL(got);
     TEST_ASSERT_TRUE(*got == i);
   }
@@ -38,46 +40,58 @@ void test_parray_append() {
 }
 
 void test_parray_length() {
-  c_parray_t *parray = parray_create();
+  c_parray_t *parray = parray_create(free);
   TEST_ASSERT_NOT_NULL(parray);
   for (int i = 0; i < 10; i++) {
-    TEST_ASSERT_TRUE(parray_append(parray, &i, sizeof(i)) == 0);
+    int *new_ptr = (int*)malloc(sizeof(int));
+    TEST_ASSERT_NOT_NULL(new_ptr);
+    *new_ptr = i;
+    TEST_ASSERT_TRUE(parray_append(parray, new_ptr) == 0);
   }
   TEST_ASSERT_TRUE(parray_length(parray) == 10);
   parray_free(parray);
 }
 
 void test_parray_insert() {
-  c_parray_t *parray = parray_create();
+  c_parray_t *parray = parray_create(free);
   TEST_ASSERT_NOT_NULL(parray);
   for (int i = 0; i < 10; i++) {
-    TEST_ASSERT_TRUE(parray_append(parray, &i, sizeof(i)) == 0);
+    int *new_ptr = (int*)malloc(sizeof(int));
+    TEST_ASSERT_NOT_NULL(new_ptr);
+    *new_ptr = i;
+    TEST_ASSERT_TRUE(parray_append(parray, new_ptr) == 0);
   }
-  const char *msg = "Hello, World!";
-  int msg_size = sizeof(char) * (strlen(msg) + 1);
-  int ok = parray_insert(parray, 3, msg, msg_size);
-  TEST_ASSERT_TRUE(ok == 0);
-  char *insert_got = (char*)parray_get(parray, 3);
-  TEST_ASSERT_TRUE(strncmp(msg, insert_got, msg_size) == 0);
+  char *msg = "Hello, World!";
+  int msg_data_size = sizeof(char) * (strlen(msg) + 1);
+  char *heap_msg = malloc(msg_data_size);
+  TEST_ASSERT_NOT_NULL(heap_msg);
+  memcpy(heap_msg, msg, msg_data_size);
+  TEST_ASSERT_TRUE(parray_insert(parray, 3, heap_msg) == 0);
+  const char *insert_got = (const char*)parray_get(parray, 3);
+  TEST_ASSERT_TRUE(strncmp(msg, insert_got, strlen(msg)) == 0);
   const char *got = (char*)parray_get(parray, 3);
-  TEST_ASSERT_TRUE(strncmp(msg, got, msg_size) == 0);
-  TEST_ASSERT_TRUE(strncmp("Hello, World!", got, msg_size) == 0);
+  TEST_ASSERT_TRUE(strncmp(msg, got, strlen(msg)) == 0);
+  TEST_ASSERT_TRUE(strncmp("Hello, World!", got, strlen(msg)) == 0);
   parray_free(parray);
 }
 
 void test_parray_insert_oob() {
-  c_parray_t *parray = parray_create();
+  c_parray_t *parray = parray_create(NULL);
   TEST_ASSERT_NOT_NULL(parray);
   int tmp = 5;
-  TEST_ASSERT_TRUE(parray_insert(parray, 3, &tmp, sizeof(tmp)) == -1);
+  TEST_ASSERT_TRUE(parray_insert(parray, 3, &tmp) == -1);
   parray_free(parray);
 }
 
 void test_parray_pop() {
-  c_parray_t *parray = parray_create();
+  c_parray_t *parray = parray_create(free);
   TEST_ASSERT_NOT_NULL(parray);
-  for (int i = 0; i < 12; i++)
-    TEST_ASSERT_TRUE(parray_append(parray, &i, sizeof(i)) == 0);
+  for (int i = 0; i < 12; i++) {
+    int *new_ptr = (int*)malloc(sizeof(int));
+    TEST_ASSERT_NOT_NULL(new_ptr);
+    *new_ptr = i;
+    TEST_ASSERT_TRUE(parray_append(parray, new_ptr) == 0);
+  }
   for (int i = 0; i < 12; i++) {
     int *got = (int*)parray_pop(parray, 0);
     TEST_ASSERT_NOT_NULL(got);
@@ -89,7 +103,7 @@ void test_parray_pop() {
 }
 
 void test_parray_pop_oob() {
-  c_parray_t *parray = parray_create();
+  c_parray_t *parray = parray_create(NULL);
   void *popped = parray_pop(parray, 0);
   TEST_ASSERT_NULL(popped);
   if (popped != NULL) free(popped);

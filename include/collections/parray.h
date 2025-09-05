@@ -21,11 +21,12 @@ typedef struct parray_t c_parray_t;
  * its internals.
  * The pointer array automatically grows its size as required.
  *
+ * @param parray_free_func Optional destructor function for child elements to be used during free.
  * @return Pointer to pointer array, or NULL on failure.
  *
  * @note Must free via `parray_free`.
  */
-c_parray_t *parray_create();
+c_parray_t *parray_create(void (*parray_free_func)(void*));
 
 
 /**
@@ -35,35 +36,37 @@ c_parray_t *parray_create();
  * Frees all memory associated with the array.
  *
  * @param parray The pointer array to free.
+ *
+ * @note Frees all remaining children if a destructor function was provided in parray creation.
  */
 void parray_free(c_parray_t *parray);
 
 /**
  *
- * @brief Appends an `item` of `size` to `parry`.
+ * @brief Appends a pointer to a pointer array.
  *
- * Appends an `item` of `size` to `parray`.
- * Copies the value of `item` and stores it.
+ * Appends a `ptr` to `parray`.
+ * The pointer array takes ownership of the pointer.
  * Grows the pointer array if needed.
  *
  * @param parray The pointer array to append to.
- * @param item The item whos value to append.
- * @param size The size of the item's value to append.
+ * @param ptr The pointer to append.
  * @return 0 on success, -1 on error.
  */
-int parray_append(c_parray_t *parray, const void *item, const size_t size);
+int parray_append(c_parray_t *parray, void *ptr);
 
 /**
  *
- * @brief Retrieves an item from the pointer array.
+ * @brief Retrieves a pointer from the pointer array.
  *
- * Retrieves the pointer array's copied value at an index.
+ * Retrieves a pointer from the pointer array at a given index.
+ * The pointer array still owns the pointer.
  *
  * @param parray The pointer array to get from.
  * @param index The index from which to get.
  * @return NULL on error, or the item at the index within the pointer array.
  */
-const void *parray_get(c_parray_t *parray, size_t index);
+const void *parray_get(const c_parray_t *parray, size_t index);
 
 /**
  *
@@ -74,35 +77,34 @@ const void *parray_get(c_parray_t *parray, size_t index);
  * @param parray The pointer array from which to retrieve the length of.
  * @return The length of the pointer array.
  */
-size_t parray_length(c_parray_t *parray);
+size_t parray_length(const c_parray_t *parray);
 
 /**
  *
- * @brief Inserts an item into the pointer array.
+ * @brief Inserts a pointer into the pointer array.
  *
- * Copies the value of `item` and inserts it into `parray`
- * at `index`.
+ * Inserts a pointer into the pointer array.
+ * The pointer array takes ownership of the pointer.
  *
  * @param parray The array to insert into.
  * @param index The index to insert to.
- * @param item The item to copy the value from and insert.
- * @param size The size of the value to copy from `item`.
+ * @param ptr The pointer to insert.
  * @return 0 on success, -1 on error.
  */
-int parray_insert(c_parray_t *parray, size_t index, const void *item, size_t size);
+int parray_insert(c_parray_t *parray, size_t index, void *ptr);
 
 /**
  *
- * @brief Pops an item from the pointer array.
+ * @brief Pops a pointer from the pointer array.
  *
- * Removes an item from the pointer array, and moves everything
- * to occupy the empty space.
+ * Pops a pointer from the pointer array, returning
+ * ownership to the user.
  *
  * @param parray The pointer array to pop from.
  * @param index The index to pop from.
- * @return NULL on error, or the removed item.
+ * @return NULL on error, or the removed pointer.
  *
- * @note You must free the returned item, as the array no longer owns it.
+ * @note You must free the returned pointer, as the array no longer owns it.
  */
 void *parray_pop(c_parray_t *parray, size_t index);
 
