@@ -62,5 +62,13 @@ parray_test_exe = executable('parray_test',
   include_directories: [unity_dirs, '.'],
 )
 
+vector_test_exe = executable('vector_test',
+  'src/vector.c',
+  'tests/test_vector.c',
+  'tests/unity/src/unity.c',
+  include_directories: [unity_dirs, '.'],
+)
+
 test('Arena tests', arena_test_exe)
 test('Parray tests', parray_test_exe)
+test('Vector tests', vector_test_exe)
