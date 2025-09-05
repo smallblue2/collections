@@ -10,6 +10,7 @@ This is mostly for my own learning in the underlying implementation of collectio
 
  - Arena (Growable) = `include/collections/arena.h`
  - Pointer Array = `include/collections/parray.h`
+ - Vectors = `include/collections/vector.h`
 
 ## Install
 
