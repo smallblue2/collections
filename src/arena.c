@@ -21,7 +21,7 @@ struct arena_t {
   int flags; // 4
 };
 
-mem_node *create_memory_node(size_t size) {
+static mem_node *create_memory_node(size_t size) {
   mem_node *new_block = (mem_node *)malloc(sizeof(mem_node));
   if (new_block == NULL) {
     return NULL;
@@ -78,13 +78,13 @@ void arena_free(arena_t *arena) {
   return;
 }
 
-void *align_ptr(void *ptr, size_t align) {
+static void *align_ptr(void *ptr, size_t align) {
   uintptr_t addr = (uintptr_t)ptr;
   uintptr_t aligned = (addr + align - 1) & ~(align - 1);
   return (void*)aligned;
 }
 
-bool is_power_of_2(size_t n) {
+static bool is_power_of_2(size_t n) {
   return n > 0 && (n  & (n - 1)) == 0;
 }
 
@@ -180,19 +180,4 @@ void arena_reset(arena_t *arena) {
   arena->used = 0;
 
   if (FLAG_ENABLED(arena, ARENA_PRINT_DEBUG)) printf("ARENA %lx : Reset!\n", (uintptr_t)arena);
-}
-
-// Not publicly exposed
-void __arena_print_stats(arena_t *arena) {
-  printf("================== STATS ==================\n");
-  printf("ARENA %lx:\n", (uintptr_t)arena);
-  printf("\tused: %lu\n\tsize: %lu\n\tnodes:\n", arena->used, arena->size);
-  int node_count = 0;
-  for(mem_node *cur = arena->head; cur != NULL;) {
-    printf("\t\t%d:\n", node_count);
-    printf("\t\t\tused: %lu\n\t\t\tsize: %lu\n", cur->used, cur->size);
-    node_count++;
-    cur = cur->next;
-  }
-  printf("===========================================\n");
 }

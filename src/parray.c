@@ -52,7 +52,7 @@ void parray_free(parray_t *parray) {
   free(parray);
 }
 
-int __parray_grow(parray_t *parray) {
+static int __parray_grow(parray_t *parray) {
   size_t new_capacity = CALCULATE_RESIZE(parray->allocation_size);
   void **new_items = realloc(parray->items, sizeof(void*) * new_capacity);
   if (new_items == NULL) return -1;

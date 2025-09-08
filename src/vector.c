@@ -14,21 +14,21 @@ struct vector_t {
   size_t elem_size; // 8
 };
 
+static const size_t VECTOR_BEGINNING_CAP = 3;
+
 vector_t *vector_create(size_t elem_size) {
   if (elem_size == 0) return NULL;
-
-  size_t beginning_cap = 3;
 
   vector_t *vec = (vector_t*)malloc(sizeof(vector_t));
   if (vec == NULL) return NULL;
   // Start with size for 3 elements (over-allocation for ammortised cost)
-  vec->mem = malloc(elem_size * beginning_cap);
+  vec->mem = malloc(elem_size * VECTOR_BEGINNING_CAP);
   if (vec->mem == NULL) {
     free(vec);
     return NULL;
   }
 
-  vec->capacity = beginning_cap;
+  vec->capacity = VECTOR_BEGINNING_CAP;
   vec->size = 0;
   vec->elem_size = elem_size;
 
